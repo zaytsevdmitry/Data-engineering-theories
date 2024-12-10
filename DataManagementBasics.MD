@@ -1,5 +1,5 @@
 # Управление данными
 DataManagement
-[управление конфигурацией](DataManagement/ConfigManagement.MD)
+[Управление конфигурацией](DataManagement/ConfigManagement.MD)
 
 [Качество данных](DataManagement/DataQuality.MD)
