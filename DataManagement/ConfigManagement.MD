@@ -19,10 +19,6 @@
 
 
 
-## Пример конфигурации
-```yaml?
-
-```
 
 
 ## Доставка изменения конфигурации. Организация процесса
@@ -57,3 +53,110 @@ git hook информирует Сервис cvs об изменении в це
 * **Аналитика метаданных хранилища** - имеет высокую ценность с точки зрения управления большим хранилищем со множеством объектов (таблицы/датасеты)
 * **UI/CLI** наличие сервиса конфигурации открывает возможности для разработки пользовательских интерфейсов
 * **Разработка вспомогательных инструментов** Возможно создание инструментов помогающих пользователю конфигурировать данные, которые в том числе могут использовать текущее состояние конфига для формирования файлов изменения конфигурации
+
+
+
+## Пример конфигурации
+```yaml
+project: # можно убрать заголовок и тело конфига датастора уложить в отдельный файл
+  name:  example.ns.first.example
+  comment: "someone project namespace"
+
+datastore: # можно убрать заголовок и тело конфига датастора уложить в отдельный файл
+  name: example
+  store: myExamplePostgressDb
+  project: example.ns.first.example
+
+
+dataset: # можно убрать заголовок и тело конфига датасета уложить в отдельный файл
+  name: example
+  store: myExamplePostgressDb
+  project: example.ns.first.example
+  substores:
+    - staging: ${table.name}_stage
+    - target: ${table.name}
+  scripts:
+    - transformation: """
+      select 
+        from ${source{example2}} e2
+             join ${source{example3}} e3
+    """
+  sources: # список других датасетов( только их ключевые имена)
+    - example2
+    - example3
+  table:
+    name: examples.example
+    comment: "example table from example db"
+    columns:
+      - name: id
+        type: bigint
+        nullable: false
+        comment: "id"
+      - name: reg_date
+        type: timestamp
+        nullable: false
+        comment: "inserted at"
+      - name: type_id
+        type: int
+        nullable: true
+        comment: "foreign table reference column"
+      - name: value
+        type: string
+        nullable: false
+        comment: ""
+    constraints:
+      - name: example_pk
+        columns: pk
+        controlled: false
+      - name: example_uk
+        columns: id,type_id
+        controlled: false
+
+permissions:
+   - action: select
+     object: example
+     grantee: ug_analitics
+   - action: select
+     object: any table
+     grantee: service_user
+   - action: insert
+     grantee: service_user
+     object: example
+
+pipeline:
+  name: example_pipe
+  dataset: example
+  project: "example.ns.first.example"
+  taskgroupTemplate: jdbc-task-group-template
+  tasks:
+      - name: example
+qualities:
+  quality1:
+    name: example_ds_example_dq
+    dataset: example
+    sources:
+      - stage
+      - target
+    test-sets:
+    thresholds:
+      - name: ${dataset}_pk
+        type: jdbc_primary_constraint
+  quality:
+    name: example_ds_example_dq
+    dataset: example
+    sources:
+      - example4
+    test-sets:
+      - name: mysqltestset
+        push down:
+          query: true
+          filter: true
+        query: ""
+        save: true
+      type: jdbc
+    thresholds:
+      - name: ${dataset}_logic_test
+        type: jdbc
+        query: ""
+
+```
