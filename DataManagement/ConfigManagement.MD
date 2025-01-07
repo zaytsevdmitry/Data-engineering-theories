@@ -89,15 +89,18 @@ project: # можно убрать заголовок и тело конфига
   comment: "someone project namespace"
 
 datastore: # можно убрать заголовок и тело конфига датастора уложить в отдельный файл
-  name: example
-  store: myExamplePostgressDb
+  name: myExamplePostgressDb
   project: example.ns.first.example
-
-
+  properties:
+   - url: jdbc:potgres:@//${example-processing-db-url} #example-processing-[dev/test/prod].com
+     user: houseuser
+     password: ${houseuser_password}
+     
 dataset: # можно убрать заголовок и тело конфига датасета уложить в отдельный файл
   name: example
   store: myExamplePostgressDb
   project: example.ns.first.example
+  sla: "* * * * *"
   substores:
     - staging: ${table.name}_stage
     - target: ${table.name}
@@ -152,10 +155,21 @@ permissions:
 pipeline:
   name: example_pipe
   dataset: example
+  interval: "* * * * *"
   project: "example.ns.first.example"
   taskgroupTemplate: jdbc-task-group-template
   tasks:
       - name: example
+        execution-class: JdbcDataTransformation #SparkDataTransformation DBTDataTransformation FlinkDataTransformation
+        
+services:
+  service:
+   name: example_service
+   dataset: example
+   task:
+    - name: example
+      execution-class: DataTransformation
+    
 qualities:
   quality1:
     name: example_ds_example_dq
