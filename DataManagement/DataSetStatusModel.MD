@@ -45,9 +45,9 @@
 
 ```json
 {
-dataResource: ?
-incr_from: ?
-incr_to: ?
+dataResource: "mydataset"
+incr_from: "2020-01-01 00:00:00"
+incr_to: "2020-01-01 00:00:00"
 }
 
 ```
