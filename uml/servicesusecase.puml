@@ -1,0 +1,14 @@
+@startuml
+!pragma layout smetana
+':ui-svc: as uisvc
+:config-svc:  as confsvc
+:status-svc:  as statussvc
+:task-executor-svc:  as taskexecutorsvc
+:scheduler-svc: as schedulersvc
+:cvs-svc: as cvssvc
+cvssvc ---> confsvc : 1 обновление конфигурации
+confsvc -> schedulersvc : 2 уведомление об изменениях
+schedulersvc <-- taskexecutorsvc : 3 запрос задачи(transform/dq etc)/блокировка/разблокировка
+taskexecutorsvc --> statussvc : 4,7 Отправка статуса
+taskexecutorsvc --> confsvc : 5 запрос
+@enduml
