@@ -1,0 +1,11 @@
+@startuml
+database    postgres
+database    clickhouse
+queue       "Schema Registry"        as sr
+control openmetadata
+actor        user
+postgres -> openmetadata
+sr -> openmetadata
+clickhouse -> openmetadata
+openmetadata-> user
+@enduml
