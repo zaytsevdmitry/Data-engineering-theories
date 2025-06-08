@@ -29,7 +29,6 @@
 
 ## [Метрики и учет](DataManagement/MetricsAndAccounting.MD)
 
-
 Схема использования
 ![services](uml/servicesusecase.png)
 
